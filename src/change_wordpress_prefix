@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+user=USER
+password=PASSWORD
+database=DATABASENAME
+
+new_prefix=NEWPREFIX
+old_prefix=OLDPREFIX
+
+for i in $(mysql -u$user -p$password $database -e "SHOW TABLES" | grep -iE "^$old_prefix"); do
+    new_name=$(echo $i | sed 's/'$old_prefix'/'$new_prefix'/g')
+    mysql -u$user -p$password $database -e "RENAME TABLE $i TO $new_name"
+    echo Renamed from $i to $new_name
+done
+
+mysql -u$user -p$password $database -e "UPDATE "$new_prefix"options SET option_name = REPLACE(option_name, '"$old_prefix"', '"$prefixo"') WHERE option_name LIKE '"$old_prefix"%'"
+mysql -u$user -p$password $database -e "UPDATE "$new_prefix"usermeta SET meta_key = REPLACE(meta_key, '"$old_prefix"', '"$prefixo"') WHERE meta_key LIKE '"$old_prefix"%'"
