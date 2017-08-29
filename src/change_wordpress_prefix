@@ -4,11 +4,11 @@
 set -e
 
 # Set here the required scripts variables
-user=USER
-password=PASSWORD
-database=DATABASENAME
-new_prefix=NEWPREFIX
-old_prefix=OLDPREFIX
+user=DATABASE_USER
+password=DATABASE_PASSWORD
+database=DATABASE_NAME
+new_prefix=NEW_PREFIX
+old_prefix=OLD_PREFIX
 
 # Loop through all the database tables and change the prefix
 for i in $(mysql -u$user -p$password $database -e "SHOW TABLES" | grep -iE "^$old_prefix"); do
@@ -18,9 +18,9 @@ for i in $(mysql -u$user -p$password $database -e "SHOW TABLES" | grep -iE "^$ol
 done
 
 # Replaces the key names based on prefix in the options table
-mysql -u$user -p$password $database -e "
-    UPDATE "$new_prefix"options SET option_name = REPLACE(option_name, '"$old_prefix"', '"$prefixo"') WHERE option_name LIKE '"$old_prefix"%'"
+mysql -u$user -p$password $database -e "UPDATE "$new_prefix"options SET option_name = REPLACE(option_name, '"$old_prefix"', '"$new_prefix"') WHERE option_name LIKE '"$old_prefix"%'"
+#echo "UPDATE "$new_prefix"options SET option_name = REPLACE(option_name, '"$old_prefix"', '"$new_prefix"') WHERE option_name LIKE '"$old_prefix"%'"
 
 # Replaces the parameters from usermeta based on prefix
-mysql -u$user -p$password $database -e "
-    UPDATE "$new_prefix"usermeta SET meta_key = REPLACE(meta_key, '"$old_prefix"', '"$prefixo"') WHERE meta_key LIKE '"$old_prefix"%'"
+mysql -u$user -p$password $database -e "UPDATE "$new_prefix"usermeta SET meta_key = REPLACE(meta_key, '"$old_prefix"', '"$new_prefix"') WHERE meta_key LIKE '"$old_prefix"%'"
+#echo "UPDATE "$new_prefix"usermeta SET meta_key = REPLACE(meta_key, '"$old_prefix"', '"$new_prefix"') WHERE meta_key LIKE '"$old_prefix"%'"
